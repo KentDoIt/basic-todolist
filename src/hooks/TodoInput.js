@@ -1,28 +1,28 @@
 import React, { useState } from 'react';
 
-function TodoInput({todo, setTodo}) {
+function TodoInput({ todo, setData }) {
     const [todoInput, setTodoInput] = useState("");
     function addTodo() {
         console.log("addTodo")
         if (!todoInput) {
-        return;
+            return;
         }
         const res = {
-        text: todoInput,
-        id: new Date().getTime(),
-        status: false,
+            text: todoInput,
+            id: new Date().getTime(),
+            status: false,
         };
-        setTodo([...todo, res]);
+        setData([...todo, res]);
         setTodoInput("");
     }
     return (
         <div className="inputBox">
-            <input type="text" placeholder="請輸入待辦事項" 
-            value={todoInput} 
-            onChange={(e) => setTodoInput(e.target.value)}
+            <input type="text" placeholder="請輸入待辦事項"
+                value={todoInput}
+                onChange={(e) => setTodoInput(e.target.value)}
             />
-            <a href="#" onClick={ addTodo }>
-            <i className="fa fa-plus"></i>
+            <a href="#" onClick={addTodo}>
+                <i className="fa fa-plus"></i>
             </a>
         </div>
     );
