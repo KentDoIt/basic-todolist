@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
+import { useState, useContext } from 'react';
+import { DataContext } from '../components/DataContext';
 
-function TodoInput({ todo, setData }) {
+
+function TodoInput() {
     const [todoInput, setTodoInput] = useState("");
-    function addTodo() {
-        console.log("addTodo")
+    const { addTodo } = useContext(DataContext);
+    function setTodo() {
         if (!todoInput) {
             return;
         }
-        const res = {
-            text: todoInput,
-            id: new Date().getTime(),
-            status: false,
-        };
-        setData([...todo, res]);
+        addTodo(todoInput);
         setTodoInput("");
     }
     return (
@@ -21,7 +18,7 @@ function TodoInput({ todo, setData }) {
                 value={todoInput}
                 onChange={(e) => setTodoInput(e.target.value)}
             />
-            <a href="#" onClick={addTodo}>
+            <a href="#" onClick={setTodo}>
                 <i className="fa fa-plus"></i>
             </a>
         </div>

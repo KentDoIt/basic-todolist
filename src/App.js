@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import './App.css';
 import TodoInput from './hooks/TodoInput';
-import TodoTab from './components/TodoTab';
 import TodoList from './hooks/TodoList';
+import { DataContext } from './components/DataContext';
 import { cloneDeep } from 'lodash';
 
 const apiData = [{
@@ -11,54 +11,73 @@ const apiData = [{
   status: false,
 }];
 
-function Todo() {
-  // const [todo, setTodo] = useState(apiData);
-  let todo = cloneDeep(apiData);
-  const [status, setStatus] = useState("all");
+// export const DataContext = React.createContext();
 
-  // for 子層更新資料，不使用 useState 是避免整個畫面重新渲染
+const Todo = () => {
+  const dataContextValue = {
+    setData,
+    getData,
+    addTodo,
+    setTabStatus,
+    getTabStatus,
+  }
+
+  let data = cloneDeep(apiData);
+  let tabStatus = "all";
+  const childRef = useRef();
+
   function setData(res) {
-    // console.log(res);
-    // setTodo(res);
-    todo = res;
-    console.log(todo);
+    data = res;
+  }
+
+  function setTabStatus(status) {
+    tabStatus = status;
+  }
+
+  function getData() {
+    return data;
+  }
+
+  function getTabStatus() {
+    return tabStatus;
+  }
+
+  function addTodo(value) {
+    // 全部、待完成 status 都是 false
+    const ret = [...getData(), {
+      text: value,
+      id: new Date().getTime(),
+      status: tabStatus == "done" ? true : false,
+    }];
+    console.log("addTodo", ret, tabStatus);
+    setData(ret);
+    // 父層觸發子層 set 方法
+    childRef.current.changeTodo(ret)
   }
 
   return (
-    <div className="container todoListPage vhContainer">
-      {console.log("renderApp", todo)}
-      <div className="todoList_Content">
-        <TodoInput
-          todo={todo}
-          setData={setData}
-        />
-        <div className="todoList_list">
-          <TodoTab
-            status={status}
-            setStatus={setStatus}
-          />
-
+    <DataContext.Provider value={dataContextValue}>
+      <div className="container todoListPage vhContainer">
+        {console.log("renderApp")}
+        <div className="todoList_Content">
+          <TodoInput />
           <TodoList
-            data={todo}
-            setData={setData}
-            status={status}
+            cRef={childRef}
           />
         </div>
       </div>
-    </div>
+    </DataContext.Provider>
   );
 }
 
 function App() {
-  const htmlTag = <div id="todoListPage" className="bg-half">
-    <nav>
-      <h1><a href="#">ONLINE TODO LIST</a></h1>
-    </nav>
-    <Todo />
-  </div>;
-
   return (
-    htmlTag
+    <div id="todoListPage" className="bg-half">
+      <nav>
+        <h1><a href="#">ONLINE TODO LIST</a></h1>
+      </nav>
+      <Todo />
+    </div>
   );
 }
 
